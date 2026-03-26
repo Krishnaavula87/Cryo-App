@@ -1,0 +1,48 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: export-service
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 30000
+      max-lifetime: 600000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: ${jwt_secret}
+  expiration: 86400
+
+freezer:
+  service:
+    url: ${freezerserviceurl}
+
+
+logging:
+  level:
+    com.cryo.export: DEBUG
+
+# //this line should  remove please rememeber Gopala.
+springdoc:
+  api-docs:
+    path: /export/v3/api-docs
+
+
+nextcloud:
+  base-url: http://192.168.0.10:30028/remote.php/dav/files/vignesh
+  username: vignesh
+  password: Twyck-zwEZG-ptHDp-BbKHT-3NaPG
+  root-folder: cryo-monitoring
+
+
+
+
+

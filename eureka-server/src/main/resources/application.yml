@@ -1,0 +1,31 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  server:
+
+    # Protect against mass instance removal
+    enable-self-preservation: true
+
+    # Eviction scan interval (default 60s)
+    eviction-interval-timer-in-ms: 60000
+
+    # Percentage of renewals required to keep registry stable
+    renewal-percent-threshold: 0.85
+
+  logging:
+    level:
+      com.netflix.eureka: INFO
+      com.netflix.discovery: INFO
+

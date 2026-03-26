@@ -1,0 +1,87 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: freezer-service
+  datasource:
+    url: ${db_url}
+    username: ${db_username}
+    password: ${db_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    maximum-pool-size: 20
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 10000
+      max-lifetime: 300000
+
+    #Apache kafka configurations
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      properties:
+#        spring.json.add.type.headers: false
+        spring.json.trusted.packages: "*"
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+
+
+
+
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: ${jwt_secret}
+  expiration: 86400
+
+alert:
+  service:
+    url: ${alertserviceurl}
+
+logging:
+  level:
+    com.cryo.freezer: INFO
+    reactor.netty: ERROR
+    io.netty: ERROR
+    org.springframework.web.reactive.function.client: ERROR
+    org.springframework.web.client: ERROR
+
+
+
+# //this line should  remove please rememeber Gopala.
+springdoc:
+  api-docs:
+    path: /freezers/v3/api-docs
+
+
+
+
+
+
+

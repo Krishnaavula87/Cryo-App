@@ -1,0 +1,105 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: cryo-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${db_password}
+      MYSQL_DATABASE: freezer_monitoring
+    ports:
+      - "3307:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: cryo-eureka
+    restart: always
+    ports:
+      - "8761:8761"
+    environment:
+      SERVER_PORT: 8761
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+
+  auth-service:
+    build: ./auth-service
+    container_name: cryo-auth
+    restart: always
+    environment:
+      SERVER_PORT: 8081
+      db_url: ${db_url}
+      db_username: ${db_username}
+      db_password: ${db_password}
+      jwt_secret: ${jwt_secret}
+      ROOT_ADMIN_EMAIL: ${ROOT_ADMIN_EMAIL}
+      ROOT_ADMIN_PASSWORD: ${ROOT_ADMIN_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+
+  freezer-service:
+    build: ./freezer-service
+    container_name: cryo-freezer
+    restart: always
+    environment:
+      SERVER_PORT: 8082
+      db_url: ${db_url}
+      db_username: ${db_username}
+      db_password: ${db_password}
+      freezerserviceurl: ${freezerserviceurl}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+
+  alert-service:
+    build: ./alert-service
+    container_name: cryo-alert
+    restart: always
+    environment:
+      SERVER_PORT: 8083
+      db_url: ${db_url}
+      db_username: ${db_username}
+      db_password: ${db_password}
+      gmail_username: ${gmail_username}
+      gmail_password: ${gmail_password}
+      alertserviceurl: ${alertserviceurl}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+
+  export-service:
+    build: ./export-service
+    container_name: cryo-export
+    restart: always
+    environment:
+      SERVER_PORT: 8084
+      FREEZER_SERVICE_URL: http://freezer-service:8082
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - freezer-service
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: cryo-gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - auth-service
+      - freezer-service
+      - alert-service
+      - export-service
+
+volumes:
+  mysql-data:

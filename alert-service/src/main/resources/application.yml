@@ -1,0 +1,102 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: alert-service
+  datasource:
+    url: ${db_url}
+    username: ${db_username}
+    password: ${db_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    maximum-pool-size: 10
+    connection-timeout: 10000
+    max-lifetime: 300000
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: alert-service-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+#        spring.json.add.type.headers: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${gmail_username}
+    password: ${gmail_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+              # 🔴 THIS FIXES THE "PKIX PATH" ERROR
+            trust: "*"
+              # Add this just in case
+          checkserveridentity: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+# ✅ NEW: WhatsApp Cloud API config
+whatsapp:
+  phone:
+    number:
+      id: 1058622750661687
+  access:
+    token: EAASDFwUACS0BQ9c4isJgbOgIne9FHahuUZBiz2g4LZAUQQlo6Bu3MMwGn2M3Ees9Yon0DK3ZAtSh6HHKZA1I5hhycgiJMZAenGBXQxG18ZAHdqev7vTUflfLn9bfrRMTKW3ZA3r9tRuNGs6cLGkgKvfHziLqSaF8e7dXFQVEA7GTkj6FFBPyXnEXZBmksfIOZAtrihcLjX1W68qZB9MbG0hS2DmmRkHZAAhifuvLYza7mIwdFx4axnRCR8yXZCZBhjZCcn1yytuam1A7JhY4WbZCHSivrxpBQrF
+
+logging:
+  level:
+    com.cryo.alert: DEBUG
+
+# //this lines should  remove please rememeber Gopala.
+springdoc:
+  api-docs:
+    path: /alerts/v3/api-docs
+
+
+jwt:
+  secret: ${jwt_secret}
+  accessExpiration: 900          # 15 minutes (recommended)
+  refreshExpiration: 604800      # 7 days (recommended)
+
+
+
+
+# ✅ Fast2SMS Configuration (Add this)
+sms:
+  fast2sms:
+    api-key: irzjOSeDNvlkfXVAdKGpTmZYcu3yQtLExo9InFbqHUMR74saw0M25m8beKyDwCPrAWk7JvLjBqlc49uF  # Replace with key from fast2sms.com
+    route: q                              # 'q' for Quick/Dev, 'v3' for DLT Production
+
+
+
+
+gateway:
+  public:
+    # 🔴 REPLACE '192.168.1.X' WITH YOUR ACTUAL IP FROM STEP 1
+    # Do NOT use localhost.
+    url: http://192.168.1.22:8080
+
+
